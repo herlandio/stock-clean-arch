@@ -9,15 +9,11 @@ import com.herlandio7.stock.infra.gateways.mappers.ProductEntityMapper;
 import com.herlandio7.stock.infra.persistence.entities.ProductEntity;
 import com.herlandio7.stock.infra.persistence.repositories.ProductRepository;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class ProductRepositoryGateway implements IProductGateway {
 
-    private static final Logger logger = LoggerFactory.getLogger(ProductRepositoryGateway.class);
     private final ProductRepository productRepository;
     private final ProductEntityMapper productEntityMapper;
 
@@ -25,7 +21,6 @@ public class ProductRepositoryGateway implements IProductGateway {
     public Product addProduct(Product productDomainObj) {
         ProductEntity productEntity = productEntityMapper.toEntity(productDomainObj);
         ProductEntity saveProduct = productRepository.save(productEntity);
-        checkCriticalStock();
         return productEntityMapper.toDomain(saveProduct);
     }
 
@@ -39,7 +34,6 @@ public class ProductRepositoryGateway implements IProductGateway {
             product.setStockQuantity(productEntity.getStockQuantity());
             product.setCriticalLevel(productEntity.getCriticalLevel());
             ProductEntity updateProduct = productRepository.save(product);
-            checkCriticalStock();
             return productEntityMapper.toDomain(updateProduct);
         }).orElseThrow(() -> new RuntimeException("Product not found"));
     }
@@ -59,17 +53,5 @@ public class ProductRepositoryGateway implements IProductGateway {
     @Override
     public void deleteProduct(Long id) {
         productRepository.deleteById(id);
-    }
-
-    public void checkCriticalStock() {
-        productRepository.findAll().forEach(product -> {
-            if (product.getStockQuantity() <= product.getCriticalLevel()) {
-                sendLowStockNotification(product);
-            }
-        });
-    }
-
-    private void sendLowStockNotification(ProductEntity product) {
-        logger.warn("Notification: Low stock for product: {}", product.getName());
     }
 }

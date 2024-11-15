@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import com.herlandio7.stock.application.usecases.CheckCriticalStockInteractor;
 import com.herlandio7.stock.application.usecases.ProductInteractor;
 import com.herlandio7.stock.domain.entity.Product;
 import com.herlandio7.stock.infra.controllers.dtos.ProductRequest;
@@ -29,6 +30,7 @@ import jakarta.validation.Valid;
 public class ProductController {
 
     private final ProductInteractor productInteractor;
+    private final CheckCriticalStockInteractor checkCriticalStockInteractor;
     private final ProductDtoMapper productDtoMapper;
 
     @PostMapping
@@ -38,6 +40,7 @@ public class ProductController {
             log.info("Adding new product: {}", productRequest);
             Product product = productDtoMapper.toProduct(productRequest);
             Product newProduct = productInteractor.addProduct(product);
+            checkCriticalStockInteractor.execute();
             ProductResponse response = productDtoMapper.toResponse(newProduct);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (Exception e) {
@@ -87,6 +90,7 @@ public class ProductController {
         try {
             Product productToUpdate = productDtoMapper.toProduct(updatedProduct);
             Product updated = productInteractor.updateProduct(id, productToUpdate);
+            checkCriticalStockInteractor.execute();
             ProductResponse response = productDtoMapper.toResponse(updated);
             return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
