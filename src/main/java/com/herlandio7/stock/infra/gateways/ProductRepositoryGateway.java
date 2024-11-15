@@ -25,6 +25,7 @@ public class ProductRepositoryGateway implements IProductGateway {
     public Product addProduct(Product productDomainObj) {
         ProductEntity productEntity = productEntityMapper.toEntity(productDomainObj);
         ProductEntity saveProduct = productRepository.save(productEntity);
+        checkCriticalStock();
         return productEntityMapper.toDomain(saveProduct);
     }
 
@@ -38,6 +39,7 @@ public class ProductRepositoryGateway implements IProductGateway {
             product.setStockQuantity(productEntity.getStockQuantity());
             product.setCriticalLevel(productEntity.getCriticalLevel());
             ProductEntity updateProduct = productRepository.save(product);
+            checkCriticalStock();
             return productEntityMapper.toDomain(updateProduct);
         }).orElseThrow(() -> new RuntimeException("Product not found"));
     }
@@ -69,6 +71,5 @@ public class ProductRepositoryGateway implements IProductGateway {
 
     private void sendLowStockNotification(ProductEntity product) {
         logger.warn("Notification: Low stock for product: {}", product.getName());
-        // Notification logic (email, SMS, etc.) would go here
     }
 }
