@@ -1,4 +1,4 @@
-package com.herlandio7.stock.model;
+package com.herlandio7.stock.infra.persistence;
 
 import java.time.LocalDateTime;
 
@@ -7,7 +7,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
-
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.Getter;
@@ -18,16 +18,29 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Movement {
+@Table(name = "movement")
+public class MovementEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
-    private Product product;
-
+    private ProductEntity product;
+    
     private int quantity;
     private String type;
     private LocalDateTime movementDate = LocalDateTime.now();
+
+    public MovementEntity(
+        ProductEntity product,
+        int quantity,
+        String type,
+        LocalDateTime movementDate
+    ) {
+        this.product = product;
+        this.quantity = quantity;
+        this.type = type;
+        this.movementDate = movementDate;
+    }
 }

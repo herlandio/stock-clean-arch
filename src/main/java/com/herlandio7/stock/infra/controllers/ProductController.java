@@ -1,4 +1,4 @@
-package com.herlandio7.stock.controller;
+package com.herlandio7.stock.infra.controllers;
 
 import java.util.List;
 
@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.herlandio7.stock.model.Product;
-import com.herlandio7.stock.service.ProductService;
+import com.herlandio7.stock.application.usecases.ProductInteractor;
+import com.herlandio7.stock.domain.entity.Product;
 
 import lombok.RequiredArgsConstructor;
 
@@ -23,31 +23,34 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ProductController {
     
-    private final ProductService stockService;
+    private final ProductInteractor productInteractor;
+    private final ProductDtoMapper productDtoMapper;
 
+    @PostMapping
+    public ResponseEntity<CreateProductResponse> addProduct(@RequestBody CreateProductRequest product) {
+        Product productBusinessObj = productDtoMapper.toProduct(product);
+        Product newProduct = productInteractor.addProduct(productBusinessObj);
+        return ResponseEntity.status(HttpStatus.CREATED).body(productDtoMapper.toResponse(newProduct));
+    }
+
+    //TODO revisar pra baixo
     @GetMapping
     public ResponseEntity<List<Product>> listProducts() {
-        List<Product> products = stockService.listProducts();
+        List<Product> products = productInteractor.listProducts();
         return ResponseEntity.ok(products);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Product> getProductById(@PathVariable Long id) {
-        return stockService.getProductById(id)
+        return productInteractor.getProductById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
-    }
-
-    @PostMapping
-    public ResponseEntity<Product> addProduct(@RequestBody Product product) {
-        Product newProduct = stockService.addProduct(product);
-        return ResponseEntity.status(HttpStatus.CREATED).body(newProduct);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Product> updateProduct(@PathVariable Long id, @RequestBody Product updatedProduct) {
         try {
-            Product product = stockService.updateProduct(id, updatedProduct);
+            Product product = productInteractor.updateProduct(id, updatedProduct);
             return ResponseEntity.ok(product);
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
@@ -56,7 +59,8 @@ public class ProductController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
-        stockService.deleteProduct(id);
+        productInteractor.deleteProduct(id);
         return ResponseEntity.noContent().build();
     }
 }
+
