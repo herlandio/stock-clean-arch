@@ -1,6 +1,7 @@
 package com.herlandio7.stock.infra.controllers;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,25 +34,31 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.CREATED).body(productDtoMapper.toResponse(newProduct));
     }
 
-    //TODO revisar pra baixo
     @GetMapping
-    public ResponseEntity<List<Product>> listProducts() {
+    public ResponseEntity<List<CreateProductResponse>> listProducts() {
         List<Product> products = productInteractor.listProducts();
-        return ResponseEntity.ok(products);
+        List<CreateProductResponse> responses = productDtoMapper.toResponseList(products);
+        return ResponseEntity.ok(responses);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Product> getProductById(@PathVariable Long id) {
-        return productInteractor.getProductById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<CreateProductResponse> getProductById(@PathVariable Long id) {
+        Optional<Product> productById = productInteractor.getProductById(id);
+        Optional<CreateProductResponse> response = productDtoMapper.toResponseById(productById);
+        return response
+            .map(ResponseEntity::ok)
+            .orElse(ResponseEntity.notFound()
+                .build()
+            );
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Product> updateProduct(@PathVariable Long id, @RequestBody Product updatedProduct) {
+    public ResponseEntity<CreateProductResponse> updateProduct(@PathVariable Long id, @RequestBody CreateProductRequest updatedProduct) {
         try {
-            Product product = productInteractor.updateProduct(id, updatedProduct);
-            return ResponseEntity.ok(product);
+            Product productRequest = productDtoMapper.toProduct(updatedProduct);
+            Product product = productInteractor.updateProduct(id, productRequest);
+            CreateProductResponse response = productDtoMapper.toResponse(product);
+            return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }

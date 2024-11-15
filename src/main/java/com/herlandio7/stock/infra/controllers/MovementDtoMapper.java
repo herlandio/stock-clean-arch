@@ -1,5 +1,8 @@
 package com.herlandio7.stock.infra.controllers;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import com.herlandio7.stock.domain.entity.Movement;
 
 public class MovementDtoMapper {
@@ -20,5 +23,11 @@ public class MovementDtoMapper {
             movement.type(), 
             movement.movementDate()
         );
+    }
+
+    List<CreateMovementResponse> toResponseList(List<Movement> movementList) {
+        return movementList.stream()
+            .map(this::toResponse)
+            .collect(Collectors.toList());
     }
 }

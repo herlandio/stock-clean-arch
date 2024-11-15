@@ -30,10 +30,10 @@ public class MovementController {
         return ResponseEntity.status(HttpStatus.CREATED).body(movementDtoMapper.toResponse(newMovement));
     }
 
-    //TODO verificar
     @GetMapping
-    public ResponseEntity<List<Movement>> listMovements() {
+    public ResponseEntity<List<CreateMovementResponse>> listMovements() {
         List<Movement> movements = movementInteractor.listMovements();
-        return ResponseEntity.ok(movements);
+        List<CreateMovementResponse> responses = movementDtoMapper.toResponseList(movements);
+        return ResponseEntity.ok(responses);
     }
 }
