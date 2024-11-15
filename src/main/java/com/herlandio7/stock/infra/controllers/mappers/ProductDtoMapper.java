@@ -1,15 +1,17 @@
-package com.herlandio7.stock.infra.controllers;
+package com.herlandio7.stock.infra.controllers.mappers;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.herlandio7.stock.domain.entity.Product;
+import com.herlandio7.stock.infra.controllers.dtos.ProductRequest;
+import com.herlandio7.stock.infra.controllers.dtos.ProductResponse;
 
 public class ProductDtoMapper {
     
-    CreateProductResponse toResponse(Product product){
-        return new CreateProductResponse(
+    public ProductResponse toResponse(Product product){
+        return new ProductResponse(
             product.name(),
             product.description(),
             product.price(),
@@ -17,7 +19,7 @@ public class ProductDtoMapper {
         );
     }
 
-    public Product toProduct(CreateProductRequest request) {
+    public Product toProduct(ProductRequest request) {
         return new Product(
             request.id(),
             request.name(),
@@ -28,13 +30,13 @@ public class ProductDtoMapper {
         );
     }
 
-    List<CreateProductResponse> toResponseList(List<Product> productList) {
+    public List<ProductResponse> toResponseList(List<Product> productList) {
         return productList.stream()
             .map(this::toResponse)
             .collect(Collectors.toList());
     }
 
-    Optional<CreateProductResponse> toResponseById(Optional<Product> productById) {
+    public Optional<ProductResponse> toResponseById(Optional<Product> productById) {
         return productById.map(this::toResponse);
     }
 }

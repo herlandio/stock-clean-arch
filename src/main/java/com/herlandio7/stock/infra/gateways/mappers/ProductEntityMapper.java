@@ -1,15 +1,15 @@
-package com.herlandio7.stock.infra.gateways;
+package com.herlandio7.stock.infra.gateways.mappers;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.herlandio7.stock.domain.entity.Product;
-import com.herlandio7.stock.infra.persistence.ProductEntity;
+import com.herlandio7.stock.infra.persistence.entities.ProductEntity;
 
 public class ProductEntityMapper {
     
-    ProductEntity toEntity(Product productDomainObj) {
+    public ProductEntity toEntity(Product productDomainObj) {
         return new ProductEntity(
             productDomainObj.id(),
             productDomainObj.name(),
@@ -20,7 +20,7 @@ public class ProductEntityMapper {
         );
     }
 
-    Product toDomain(ProductEntity productEntity) {
+    public Product toDomain(ProductEntity productEntity) {
         return new Product(
             productEntity.getId(),
             productEntity.getName(),
@@ -31,11 +31,11 @@ public class ProductEntityMapper {
         );
     }
 
-    Optional<Product> toDomainById(Optional<ProductEntity> productEntity) {
+    public Optional<Product> toDomainById(Optional<ProductEntity> productEntity) {
         return productEntity.map(this::toDomain);
     }
 
-    List<Product> toDomainList(List<ProductEntity> productEntities) {
+    public List<Product> toDomainList(List<ProductEntity> productEntities) {
         return productEntities.stream()
             .map(this::toDomain)
             .collect(Collectors.toList());

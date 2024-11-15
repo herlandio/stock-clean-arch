@@ -1,8 +1,8 @@
-package com.herlandio7.stock.infra.controllers;
+package com.herlandio7.stock.infra.controllers.dtos;
 
 import java.math.BigDecimal;
 
-public record CreateProductResponse (
+public record ProductResponse (
   	String name,
 	String description,
 	BigDecimal price,

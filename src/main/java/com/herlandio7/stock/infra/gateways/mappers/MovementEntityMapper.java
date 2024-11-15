@@ -1,12 +1,12 @@
-package com.herlandio7.stock.infra.gateways;
+package com.herlandio7.stock.infra.gateways.mappers;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 import com.herlandio7.stock.domain.entity.Movement;
 import com.herlandio7.stock.domain.entity.Product;
-import com.herlandio7.stock.infra.persistence.MovementEntity;
-import com.herlandio7.stock.infra.persistence.ProductEntity;
+import com.herlandio7.stock.infra.persistence.entities.MovementEntity;
+import com.herlandio7.stock.infra.persistence.entities.ProductEntity;
 
 import lombok.AllArgsConstructor;
 
@@ -35,7 +35,7 @@ public class MovementEntityMapper {
         );
     }
 
-    List<Movement> toDomainList(List<MovementEntity> movementEntities) {
+    public List<Movement> toDomainList(List<MovementEntity> movementEntities) {
         return movementEntities.stream()
             .map(this::toDomain)
             .collect(Collectors.toList());

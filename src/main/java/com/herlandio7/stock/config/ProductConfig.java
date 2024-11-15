@@ -1,14 +1,14 @@
-package com.herlandio7.stock.main;
+package com.herlandio7.stock.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.herlandio7.stock.application.gateways.IProductGateway;
 import com.herlandio7.stock.application.usecases.ProductInteractor;
-import com.herlandio7.stock.infra.controllers.ProductDtoMapper;
-import com.herlandio7.stock.infra.gateways.ProductEntityMapper;
+import com.herlandio7.stock.infra.controllers.mappers.ProductDtoMapper;
 import com.herlandio7.stock.infra.gateways.ProductRepositoryGateway;
-import com.herlandio7.stock.infra.persistence.ProductRepository;
+import com.herlandio7.stock.infra.gateways.mappers.ProductEntityMapper;
+import com.herlandio7.stock.infra.persistence.repositories.ProductRepository;
 
 @Configuration
 public class ProductConfig {

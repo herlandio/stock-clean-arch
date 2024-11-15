@@ -16,6 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.herlandio7.stock.application.usecases.ProductInteractor;
 import com.herlandio7.stock.domain.entity.Product;
+import com.herlandio7.stock.infra.controllers.dtos.ProductRequest;
+import com.herlandio7.stock.infra.controllers.dtos.ProductResponse;
+import com.herlandio7.stock.infra.controllers.mappers.ProductDtoMapper;
 
 import lombok.RequiredArgsConstructor;
 
@@ -28,23 +31,23 @@ public class ProductController {
     private final ProductDtoMapper productDtoMapper;
 
     @PostMapping
-    public ResponseEntity<CreateProductResponse> addProduct(@RequestBody CreateProductRequest product) {
+    public ResponseEntity<ProductResponse> addProduct(@RequestBody ProductRequest product) {
         Product productBusinessObj = productDtoMapper.toProduct(product);
         Product newProduct = productInteractor.addProduct(productBusinessObj);
         return ResponseEntity.status(HttpStatus.CREATED).body(productDtoMapper.toResponse(newProduct));
     }
 
     @GetMapping
-    public ResponseEntity<List<CreateProductResponse>> listProducts() {
+    public ResponseEntity<List<ProductResponse>> listProducts() {
         List<Product> products = productInteractor.listProducts();
-        List<CreateProductResponse> responses = productDtoMapper.toResponseList(products);
+        List<ProductResponse> responses = productDtoMapper.toResponseList(products);
         return ResponseEntity.ok(responses);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CreateProductResponse> getProductById(@PathVariable Long id) {
+    public ResponseEntity<ProductResponse> getProductById(@PathVariable Long id) {
         Optional<Product> productById = productInteractor.getProductById(id);
-        Optional<CreateProductResponse> response = productDtoMapper.toResponseById(productById);
+        Optional<ProductResponse> response = productDtoMapper.toResponseById(productById);
         return response
             .map(ResponseEntity::ok)
             .orElse(ResponseEntity.notFound()
@@ -53,11 +56,11 @@ public class ProductController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CreateProductResponse> updateProduct(@PathVariable Long id, @RequestBody CreateProductRequest updatedProduct) {
+    public ResponseEntity<ProductResponse> updateProduct(@PathVariable Long id, @RequestBody ProductRequest updatedProduct) {
         try {
             Product productRequest = productDtoMapper.toProduct(updatedProduct);
             Product product = productInteractor.updateProduct(id, productRequest);
-            CreateProductResponse response = productDtoMapper.toResponse(product);
+            ProductResponse response = productDtoMapper.toResponse(product);
             return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();

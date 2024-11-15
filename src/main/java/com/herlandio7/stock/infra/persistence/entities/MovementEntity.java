@@ -1,4 +1,4 @@
-package com.herlandio7.stock.infra.persistence;
+package com.herlandio7.stock.infra.persistence.entities;
 
 import java.time.LocalDateTime;
 

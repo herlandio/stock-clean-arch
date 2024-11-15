@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.herlandio7.stock.application.usecases.MovementInteractor;
 import com.herlandio7.stock.domain.entity.Movement;
+import com.herlandio7.stock.infra.controllers.dtos.MovementRequest;
+import com.herlandio7.stock.infra.controllers.dtos.MovementResponse;
+import com.herlandio7.stock.infra.controllers.mappers.MovementDtoMapper;
 
 import lombok.RequiredArgsConstructor;
 
@@ -24,16 +27,16 @@ public class MovementController {
     private final MovementDtoMapper movementDtoMapper;
 
     @PostMapping
-    public ResponseEntity<CreateMovementResponse> addMovement(@RequestBody CreateMovementRequest movement) {
+    public ResponseEntity<MovementResponse> addMovement(@RequestBody MovementRequest movement) {
         Movement movementBusinessObj = movementDtoMapper.toMovement(movement);
         Movement newMovement = movementInteractor.addMovement(movementBusinessObj);
         return ResponseEntity.status(HttpStatus.CREATED).body(movementDtoMapper.toResponse(newMovement));
     }
 
     @GetMapping
-    public ResponseEntity<List<CreateMovementResponse>> listMovements() {
+    public ResponseEntity<List<MovementResponse>> listMovements() {
         List<Movement> movements = movementInteractor.listMovements();
-        List<CreateMovementResponse> responses = movementDtoMapper.toResponseList(movements);
+        List<MovementResponse> responses = movementDtoMapper.toResponseList(movements);
         return ResponseEntity.ok(responses);
     }
 }

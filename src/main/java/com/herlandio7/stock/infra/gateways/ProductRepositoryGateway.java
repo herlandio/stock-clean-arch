@@ -5,8 +5,9 @@ import java.util.Optional;
 
 import com.herlandio7.stock.application.gateways.IProductGateway;
 import com.herlandio7.stock.domain.entity.Product;
-import com.herlandio7.stock.infra.persistence.ProductEntity;
-import com.herlandio7.stock.infra.persistence.ProductRepository;
+import com.herlandio7.stock.infra.gateways.mappers.ProductEntityMapper;
+import com.herlandio7.stock.infra.persistence.entities.ProductEntity;
+import com.herlandio7.stock.infra.persistence.repositories.ProductRepository;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -4,8 +4,9 @@ import java.util.List;
 
 import com.herlandio7.stock.application.gateways.IMovementGateway;
 import com.herlandio7.stock.domain.entity.Movement;
-import com.herlandio7.stock.infra.persistence.MovementEntity;
-import com.herlandio7.stock.infra.persistence.MovementRepository;
+import com.herlandio7.stock.infra.gateways.mappers.MovementEntityMapper;
+import com.herlandio7.stock.infra.persistence.entities.MovementEntity;
+import com.herlandio7.stock.infra.persistence.repositories.MovementRepository;
 
 import lombok.RequiredArgsConstructor;
 
