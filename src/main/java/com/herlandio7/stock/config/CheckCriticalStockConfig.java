@@ -7,6 +7,7 @@ import com.herlandio7.stock.infra.gateways.CheckCriticalStockGateway;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.kafka.core.KafkaTemplate;
 
 @Configuration
 public class CheckCriticalStockConfig {
@@ -17,7 +18,7 @@ public class CheckCriticalStockConfig {
     }
 
     @Bean
-    public ICheckCriticalStock checkCriticalStockGateway(IProductGateway iProductGateway) {
-        return new CheckCriticalStockGateway(iProductGateway);
+    public ICheckCriticalStock checkCriticalStockGateway(IProductGateway iProductGateway, KafkaTemplate<String, String> kafkaProducer) {
+        return new CheckCriticalStockGateway(iProductGateway, kafkaProducer);
     }
 }
