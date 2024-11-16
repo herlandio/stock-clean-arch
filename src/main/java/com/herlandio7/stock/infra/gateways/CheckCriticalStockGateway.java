@@ -1,6 +1,8 @@
 package com.herlandio7.stock.infra.gateways;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,13 +21,18 @@ public class CheckCriticalStockGateway implements ICheckCriticalStock {
     private final IProductGateway productGateway;
     private static final String TOPIC = "low-stock-notifications";
     private final KafkaTemplate<String, String> kafkaTemplate;
+    private Set<Long> processedProductIds = new HashSet<>();
 
     @Override
     public void execute() {
         List<Product> products = productGateway.listProducts();
         products.stream()
-                .filter(product -> product.stockQuantity() <= product.criticalLevel())
-                .forEach(this::sendLowStockNotification);
+            .filter(product -> product.stockQuantity() <= product.criticalLevel())
+            .filter(product -> !processedProductIds.contains(product.id()))
+            .forEach(product -> {
+                sendLowStockNotification(product);
+                processedProductIds.add(product.id());
+            });
     }
 
     private void sendLowStockNotification(Product product) {
