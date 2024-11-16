@@ -4,8 +4,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 
 import com.herlandio7.stock.application.gateways.ICheckCriticalStock;
@@ -13,11 +11,12 @@ import com.herlandio7.stock.application.gateways.IProductGateway;
 import com.herlandio7.stock.domain.entity.Product;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RequiredArgsConstructor
 public class CheckCriticalStockGateway implements ICheckCriticalStock {
     
-    private static final Logger logger = LoggerFactory.getLogger(CheckCriticalStockGateway.class);
     private final IProductGateway productGateway;
     private static final String TOPIC = "low-stock-notifications";
     private final KafkaTemplate<String, String> kafkaTemplate;
@@ -37,13 +36,12 @@ public class CheckCriticalStockGateway implements ICheckCriticalStock {
 
     private void sendLowStockNotification(Product product) {
         String message = String.format("Low stock for product: %s (ID: %s)", product.name(), product.id());
-        logger.warn("Notification: {}", message);
-
+        log.info("Notification: {}", message);
         kafkaTemplate.send(TOPIC, String.valueOf(product.id()), message)
-                .thenAccept(result -> logger.info("Message sent to topic {} with offset {}",
+                .thenAccept(result -> log.info("Message sent to topic {} with offset {}",
                         result.getRecordMetadata().topic(), result.getRecordMetadata().offset()))
                 .exceptionally(ex -> {
-                    logger.error("Failed to send message to Kafka", ex);
+                    log.error("Failed to send message to Kafka", ex);
                     return null;
                 });
     }
