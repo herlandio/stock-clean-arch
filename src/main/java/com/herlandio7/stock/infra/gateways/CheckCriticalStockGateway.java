@@ -24,6 +24,7 @@ public class CheckCriticalStockGateway implements ICheckCriticalStock {
     private static final String TOPIC_CRITICAL = "critical-stock-notifications";
     private static final String TOPIC_MODERATE = "moderate-stock-notifications";
     private static final String TOPIC_LOW = "low-stock-notifications";
+    private static final String TOPIC_DLQ_SUFFIX = ".dlq";
 
     @Override
     public void execute() {
@@ -43,13 +44,15 @@ public class CheckCriticalStockGateway implements ICheckCriticalStock {
                 product.name(), product.id(), product.stockQuantity(), product.criticalLevel());
 
         log.info("Notification: {}", message);
+        
         kafkaTemplate.send(topic, String.valueOf(product.id()), message)
-                .thenAccept(result -> log.info("Message sent to topic {} with offset {}",
-                        result.getRecordMetadata().topic(), result.getRecordMetadata().offset()))
-                .exceptionally(ex -> {
-                    log.error("Failed to send message to Kafka", ex);
-                    return null;
-                });
+            .thenAccept(result -> log.info("Message sent to topic {} with offset {}",
+                    result.getRecordMetadata().topic(), result.getRecordMetadata().offset()))
+            .exceptionally(ex -> {
+                log.error("Failed to send message to Kafka, sending to DLQ", ex);
+                sendToDeadLetterQueue(topic, String.valueOf(product.id()), message);
+                return null;
+            });
     }
 
     private String getTopicBasedOnStock(Product product) {
@@ -62,5 +65,16 @@ public class CheckCriticalStockGateway implements ICheckCriticalStock {
         } else {
             return TOPIC_LOW;
         }
+    }
+
+    private void sendToDeadLetterQueue(String topic, String key, String value) {
+        String dlqTopic = topic + TOPIC_DLQ_SUFFIX;
+        kafkaTemplate.send(dlqTopic, key, value)
+            .thenAccept(result -> log.info("Message sent to DLQ topic {} with offset {}",
+                    result.getRecordMetadata().topic(), result.getRecordMetadata().offset()))
+            .exceptionally(ex -> {
+                log.error("Failed to send message to DLQ as well", ex);
+                return null;
+            });
     }
 }
