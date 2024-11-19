@@ -49,11 +49,16 @@ public class CheckCriticalStockGateway implements ICheckCriticalStock {
 
     private void sendNotificationBasedOnStock(Product product) {
         String topic = getTopicBasedOnStock(product);
+    
+        if (topic == null || topic.isEmpty()) {
+            throw new IllegalArgumentException("Topic cannot be null or empty for product ID: " + product.id());
+        }
+    
         String message = String.format("Stock alert for product: %s (ID: %s), Current stock: %d, Critical level: %d",
                 product.name(), product.id(), product.stockQuantity(), product.criticalLevel());
-
+    
         log.info("Sending notification: {} to topic: {}", message, topic);
-
+    
         kafkaTemplate.send(topic, String.valueOf(product.id()), message)
             .thenAccept(result -> {
                 log.info("Notification sent successfully to topic {} for product {} (ID: {}). Offset: {}",
@@ -70,7 +75,7 @@ public class CheckCriticalStockGateway implements ICheckCriticalStock {
                 sendToDeadLetterQueue(topic, String.valueOf(product.id()), message);
                 return null;
             });
-    }    
+    }
 
     private String getTopicBasedOnStock(Product product) {
         int stockDifference = product.criticalLevel() - product.stockQuantity();
