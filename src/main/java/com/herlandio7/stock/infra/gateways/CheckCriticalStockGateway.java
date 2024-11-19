@@ -9,7 +9,9 @@ import org.springframework.kafka.core.KafkaTemplate;
 import com.herlandio7.stock.application.gateways.ICheckCriticalStock;
 import com.herlandio7.stock.application.gateways.IProductGateway;
 import com.herlandio7.stock.domain.entity.Product;
+import com.herlandio7.stock.infra.config.messaging.KafkaTopicsConfig;
 
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -19,13 +21,11 @@ public class CheckCriticalStockGateway implements ICheckCriticalStock {
     
     private final IProductGateway productGateway;
     private final KafkaTemplate<String, String> kafkaTemplate;
+    private final MeterRegistry meterRegistry;
+    private final KafkaTopicsConfig kafkaTopicsConfig;
+
     private Set<Long> processedProductIds = new HashSet<>();
-
-    private static final String TOPIC_CRITICAL = "critical-stock-notifications";
-    private static final String TOPIC_MODERATE = "moderate-stock-notifications";
-    private static final String TOPIC_LOW = "low-stock-notifications";
-    private static final String TOPIC_DLQ_SUFFIX = ".dlq";
-
+    
     @Override
     public void execute() {
         List<Product> products = productGateway.listProducts();
@@ -43,32 +43,40 @@ public class CheckCriticalStockGateway implements ICheckCriticalStock {
         String message = String.format("Stock alert for product: %s (ID: %s), Current stock: %d, Critical level: %d",
                 product.name(), product.id(), product.stockQuantity(), product.criticalLevel());
 
-        log.info("Notification: {}", message);
-        
+        log.info("Sending notification: {} to topic: {}", message, topic);
+
         kafkaTemplate.send(topic, String.valueOf(product.id()), message)
-            .thenAccept(result -> log.info("Message sent to topic {} with offset {}",
-                    result.getRecordMetadata().topic(), result.getRecordMetadata().offset()))
+            .thenAccept(result -> {
+                log.info("Notification sent successfully to topic {} for product {} (ID: {}). Offset: {}",
+                        result.getRecordMetadata().topic(),
+                        product.name(),
+                        product.id(),
+                        result.getRecordMetadata().offset());
+                        meterRegistry.counter("kafka_messages_sent_successfully").increment();
+            })
             .exceptionally(ex -> {
-                log.error("Failed to send message to Kafka, sending to DLQ", ex);
+                log.error("Failed to send notification to Kafka for product {} (ID: {}). Sending to DLQ", 
+                          product.name(), product.id(), ex);
+                          meterRegistry.counter("kafka_messages_failed").increment();
                 sendToDeadLetterQueue(topic, String.valueOf(product.id()), message);
                 return null;
             });
-    }
+    }    
 
     private String getTopicBasedOnStock(Product product) {
         int stockDifference = product.criticalLevel() - product.stockQuantity();
 
         if (stockDifference >= 10) {
-            return TOPIC_CRITICAL;
+            return kafkaTopicsConfig.getTopicCritical();
         } else if (stockDifference >= 5) {
-            return TOPIC_MODERATE;
+            return kafkaTopicsConfig.getTopicModerate();
         } else {
-            return TOPIC_LOW;
+            return kafkaTopicsConfig.getTopicLow();
         }
     }
 
     private void sendToDeadLetterQueue(String topic, String key, String value) {
-        String dlqTopic = topic + TOPIC_DLQ_SUFFIX;
+        String dlqTopic = topic + kafkaTopicsConfig.getTopicDlqSuffix();
         kafkaTemplate.send(dlqTopic, key, value)
             .thenAccept(result -> log.info("Message sent to DLQ topic {} with offset {}",
                     result.getRecordMetadata().topic(), result.getRecordMetadata().offset()))
