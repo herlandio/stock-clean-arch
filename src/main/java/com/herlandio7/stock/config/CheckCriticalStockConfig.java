@@ -5,6 +5,7 @@ import com.herlandio7.stock.application.gateways.IProductGateway;
 import com.herlandio7.stock.application.usecases.CheckCriticalStockInteractor;
 import com.herlandio7.stock.infra.config.messaging.KafkaTopicsConfig;
 import com.herlandio7.stock.infra.gateways.CheckCriticalStockGateway;
+import com.herlandio7.stock.infra.persistence.cache.ProcessedProductsCache;
 
 import io.micrometer.core.instrument.MeterRegistry;
 
@@ -25,13 +26,15 @@ public class CheckCriticalStockConfig {
         IProductGateway iProductGateway,
         KafkaTemplate<String, String> kafkaProducer,
         MeterRegistry meterRegistry,
-        KafkaTopicsConfig kafkaTopicsConfig
+        KafkaTopicsConfig kafkaTopicsConfig,
+        ProcessedProductsCache processedProductsCache
     ) {
         return new CheckCriticalStockGateway(
             iProductGateway,
             kafkaProducer,
             meterRegistry,
-            kafkaTopicsConfig
+            kafkaTopicsConfig,
+            processedProductsCache
         );
     }
 }
