@@ -80,8 +80,8 @@ Para acessar a documentação:
 
 - **Dashboard Prometheus:**
     
-    Métricas detalhadas disponíveis em: http://localhost:9090
+    Métricas detalhadas disponíveis em: `http://localhost:9090`
 
 - **Visualização Grafana:**
     
-    Dashboards configuráveis disponíveis em: http://localhost:3000
+    Dashboards configuráveis disponíveis em: `http://localhost:3000`
