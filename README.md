@@ -68,7 +68,7 @@ Para acessar a documentação:
 
 1. Clone o repositório:
     ```
-    git clone <url-do-repositorio>
+    git clone https://github.com/herlandio/stock-clean-arch
     ``` 
 
 2. Suba os serviços com Docker Compose:
