@@ -6,39 +6,41 @@ Este projeto é um sistema de gerenciamento de estoque projetado para escalabili
 
 ### Funcionalidades Principais
 
-1. **Alertas Inteligentes**
+**1. Alertas Inteligentes**
 
-    - **Níveis de Criticidade Diferenciados:**
+- **Níveis de Criticidade Diferenciados:**
 
-        Permite configurar múltiplos níveis de criticidade, como "crítico", "moderado" e "baixo", com ações específicas para cada nível.
+    Permite configurar múltiplos níveis de criticidade, como "crítico", "moderado" e "baixo", com ações específicas para cada nível.
 
-    -  **Prioridade de Notificação:**
+-  **Prioridade de Notificação:**
 
-        Utiliza tópicos diferentes no Kafka para tratar notificações críticas com maior prioridade, garantindo baixa latência.
+    Utiliza tópicos diferentes no Kafka para tratar notificações críticas com maior prioridade, garantindo baixa latência.
 
-2. **Gerenciamento de Estoque**
+**2. Gerenciamento de Estoque**
     
-    - Controle de entrada e saída de produtos.
+- Controle de entrada e saída de produtos.
 
-    - Notificações automáticas para reabastecimento quando o estoque atinge níveis mínimos.
+- Notificações automáticas para reabastecimento quando o estoque atinge níveis mínimos.
 
-3. **Escalabilidade e Resiliência**
-    - **Retry e Dead Letter Queues:**
+**3. Escalabilidade e Resiliência**
 
-        Configura tópicos de retrabalho e filas mortas no Kafka para mensagens que falham no envio ou processamento.
+- **Retry e Dead Letter Queues:**
 
-    - **Balanceamento de Carga:**
+    Configura tópicos de retrabalho e filas mortas no Kafka para mensagens que falham no envio ou processamento.
 
-        Implementa múltiplos consumidores Kafka para processar mensagens de forma escalável.
+- **Balanceamento de Carga:**
 
-4. **Auditoria e Logs**
-    - **Histórico de Notificações:**
-        
-        Armazena todas as notificações enviadas em um log para auditoria e conformidade.
+    Implementa múltiplos consumidores Kafka para processar mensagens de forma escalável.
 
-    - **Métricas e Alertas Internos:**
+**4. Auditoria e Logs**
 
-        Integração com Prometheus e Grafana para monitorar o desempenho e gerar alertas em tempo real.
+- **Histórico de Notificações:**
+    
+    Armazena todas as notificações enviadas em um log para auditoria e conformidade.
+
+- **Métricas e Alertas Internos:**
+
+    Integração com Prometheus e Grafana para monitorar o desempenho e gerar alertas em tempo real.
 
 ### Tecnologias Utilizadas
 
@@ -66,15 +68,17 @@ Para acessar a documentação:
 
 ### Passos
 
-1. Clone o repositório:
-    ```
-    git clone https://github.com/herlandio/stock-clean-arch
-    ``` 
+**1. Clone o repositório:**
 
-2. Suba os serviços com Docker Compose:
-    ```
-    docker-compose up -d 
-    ```
+```
+git clone https://github.com/herlandio/stock-clean-arch
+``` 
+
+**2. Suba os serviços com Docker Compose:**
+
+```
+docker-compose up -d 
+```
 
 ### Monitoramento
 
